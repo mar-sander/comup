@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24C実習スケジュール</title>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
+body {
+  font-family: sans-serif;
+  background: #FFFFFF;
+  color: #000000;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+    line-height: 1.6;
+}
+
+
+  h2 {
+    font-family: "Oswald", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    font-weight: 600;
+    font-size: 36px;
+    letter-spacing: -0.04em;
+  }
+  
+  h2 .subtitle {
+    font-size: 0.5em;
+  }
+
+.container {
+  max-width: 800px;
+  margin: auto;
+
+}
+
+/* ▼ セレクトラッパー */
+.select-wrapper {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+/* ▼ 班選択 */
+select {
+  width: 100%;
+  padding: 12px;
+  padding-right: 40px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+  background: #004CA0;
+  color: #FFFFFF;
+  appearance: none;
+}
+
+/* ▼ 白い矢印 */
+.select-wrapper::after {
+  content: "";
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: translateY(-50%) rotate(45deg);
+  pointer-events: none;
+}
+
+/* ▼ 今日 */
+.today {
+  margin-bottom: 20px;
+  font-size: 0.95em;
+  color: #555;
+}
+
+/* ▼ カード */
+.card {
+  background: #FFFFFF;
+  padding: 20px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+  border: 2px solid #DBDBDB;
+}
+
+.label {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.now {
+  color: #004CA0;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.next {
+  color: #004CA0;
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.warning {
+  color: #C9A333;
+  font-weight: bold;
+  font-size: 1.4em;
+}
+
+.sub {
+  margin-top: 8px;
+  color: #555;
+  line-height: 1.6;
+}
+
+  /* ===== スマホ最適化 ===== */
+  @media (max-width: 600px) {
+
+    body {
+      padding: 15px;
+      font-size: 16px;
+    }
+
+    h2 {
+
+    }
+
+    input[type="date"] {
+      max-width: 100%;
+    }
+
+    #days {
+
+    }
+
+    button {
+    }
+  }
+
+
+</style>
+</head>
+
+<body>
+
+<h2>COMING UP<span class="subtitle"> - VER. MM</span></h2>
+
+<div class="container">
+
+<!-- ▼ 班選択 -->
+<div class="select-wrapper">
+  <select id="groupSelect">
+    <option disabled selected>班を選択してください</option>
+    <option value="1">1班 (No.1～8)</option>
+    <option value="2">2班 (No.9～16)</option>
+    <option value="3">3班 (No.17～24)</option>
+    <option value="4">4班 (No.25～32)</option>
+    <option value="5">5班 (No.33～41)</option>
+  </select>
+</div>
+
+<!-- ▼ 今日 -->
+<div id="today" class="today"></div>
+
+<!-- ▼ 次の実習 -->
+<div class="card">
+  <div class="label">次の実習（全3回）</div>
+  <div id="currentTask" class="now"></div>
+  <div id="currentDates" class="sub"></div>
+</div>
+
+<!-- ▼ 締切 -->
+<div class="card">
+  <div class="label">レポート締切まで</div>
+  <div id="deadline" class="warning"></div>
+</div>
+
+<!-- ▼ その次 -->
+<div class="card">
+  <div class="label">その次の実習</div>
+  <div id="nextTask" class="next"></div>
+  <div id="nextDate" class="sub"></div>
+</div>
+
+</div>
+
+<script>
+
+// ===== 今日表示 =====
+function formatToday() {
+  const now = new Date();
+  const week = ["日","月","火","水","木","金","土"];
+  return `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}（${week[now.getDay()]}）`;
+}
+
+// ===== データ =====
+const schedule = [
+  {
+    date: "2026-04-14",
+    tasks: {
+      1: "太陽光発電（計測室）",
+      2: "光通信（応用室）",
+      3: "シーケンスⅡ（自制Ⅰ）",
+      4: "誘導電動機（機器室）",
+      5: "ゲームプログラミング（電算室）"
+    }
+  },
+  { date: "2026-04-21", tasks: {1:"",2:"",3:"",4:"",5:""} },
+  { date: "2026-04-24", tasks: {1:"",2:"",3:"",4:"",5:""} },
+
+  {
+    date: "2026-06-01",
+    tasks: {
+      1: "光通信（応用室）",
+      2: "シーケンスⅡ（自制Ⅰ）",
+      3: "誘導電動機（機器室）",
+      4: "ゲームプログラミング（電算室）",
+      5: "太陽光発電（計測室）"
+    }
+  }
+];
+
+const deadlines = [
+  "2026-05-01",
+  "2026-07-08",
+  "2026-09-15",
+  "2026-10-20",
+  "2026-11-17"
+];
+
+// ===== 日数計算 =====
+function calcDays(target) {
+  const today = new Date();
+  const t = new Date(target);
+  return Math.ceil((t - today) / (1000 * 60 * 60 * 24));
+}
+
+// ===== 次のテーマ（3回）=====
+function getCurrentBlock(group) {
+  const today = new Date();
+
+  for (let i = 0; i < schedule.length; i++) {
+    if (new Date(schedule[i].date) >= today) {
+
+      const theme = schedule[i].tasks[group];
+      if (!theme) continue;
+
+      const block = schedule.slice(i, i + 3);
+
+      return {
+        theme: theme,
+        dates: block.map(b => b.date)
+      };
+    }
+  }
+}
+
+// ===== 次のテーマ =====
+function getNextTheme(group) {
+  const today = new Date();
+  let found = false;
+
+  for (let i = 0; i < schedule.length; i++) {
+    if (new Date(schedule[i].date) >= today) {
+      const theme = schedule[i].tasks[group];
+      if (!theme) continue;
+
+      if (!found) {
+        found = true;
+      } else {
+        return {
+          theme: theme,
+          date: schedule[i].date
+        };
+      }
+    }
+  }
+}
+
+// ===== 締切 =====
+function getNextDeadline() {
+  const today = new Date();
+  return deadlines.find(d => new Date(d) >= today);
+}
+
+// ===== 更新 =====
+function update() {
+  const group = document.getElementById("groupSelect").value;
+  if (!group) return;
+
+  const current = getCurrentBlock(group);
+  if (current) {
+    document.getElementById("currentTask").innerText = current.theme;
+    document.getElementById("currentDates").innerHTML =
+      current.dates.map((d, i) =>
+        `${i+1}回目：${d}（あと${calcDays(d)}日）`
+      ).join("<br>");
+  }
+
+  const next = getNextTheme(group);
+  if (next) {
+    document.getElementById("nextTask").innerText = next.theme;
+    document.getElementById("nextDate").innerText =
+      `${next.date}（あと${calcDays(next.date)}日）`;
+  }
+
+  const d = getNextDeadline();
+  if (d) {
+    const days = calcDays(d);
+    const el = document.getElementById("deadline");
+
+    el.innerText = `あと${days}日（${d}）`;
+
+    if (days <= 3) {
+      el.style.color = "#d00000";
+    }
+  }
+}
+
+// ===== 初期化 =====
+document.getElementById("today").innerText = formatToday();
+document.getElementById("groupSelect").addEventListener("change", update);
+
+</script>
+
+</body>
+</html>
