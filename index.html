@@ -6,49 +6,39 @@
 <title>24C実習スケジュール</title>
 
 <style>
-
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
 
 body {
   font-family: sans-serif;
   background: #FFFFFF;
   color: #000000;
-    padding: 20px;
-    max-width: 600px;
-    margin: auto;
-    line-height: 1.6;
-}
-
-
-  h2 {
-    font-family: "Oswald", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
-    font-weight: 600;
-    font-size: 36px;
-    letter-spacing: -0.04em;
-  }
-  
-  h2 .subtitle {
-    font-size: 0.5em;
-  }
-
-.container {
-  max-width: 800px;
+  padding: 20px;
+  max-width: 600px;
   margin: auto;
-
+  line-height: 1.6;
 }
 
-/* ▼ セレクトラッパー */
+h2 {
+  font-family: "Oswald", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  font-weight: 600;
+  font-size: 36px;
+  letter-spacing: -0.04em;
+  color: #004CA0;
+}
+h2 .subtitle {
+  font-size: 0.5em;
+}
+
 .select-wrapper {
   position: relative;
   margin-bottom: 10px;
 }
 
-/* ▼ 班選択 */
 select {
   width: 100%;
   padding: 12px;
   padding-right: 40px;
-  border-radius: 10px;
+  border-radius: 0px;
   border: none;
   font-size: 16px;
   background: #004CA0;
@@ -56,7 +46,6 @@ select {
   appearance: none;
 }
 
-/* ▼ 白い矢印 */
 .select-wrapper::after {
   content: "";
   position: absolute;
@@ -70,18 +59,16 @@ select {
   pointer-events: none;
 }
 
-/* ▼ 今日 */
 .today {
   margin-bottom: 20px;
   font-size: 0.95em;
   color: #555;
 }
 
-/* ▼ カード */
 .card {
   background: #FFFFFF;
   padding: 20px;
-  border-radius: 14px;
+  border-radius: 0px;
   margin-bottom: 16px;
   border: 2px solid #DBDBDB;
 }
@@ -114,40 +101,12 @@ select {
   color: #555;
   line-height: 1.6;
 }
-
-  /* ===== スマホ最適化 ===== */
-  @media (max-width: 600px) {
-
-    body {
-      padding: 15px;
-      font-size: 16px;
-    }
-
-    h2 {
-
-    }
-
-    input[type="date"] {
-      max-width: 100%;
-    }
-
-    #days {
-
-    }
-
-    button {
-    }
-  }
-
-
 </style>
 </head>
 
 <body>
 
 <h2>COMING UP<span class="subtitle"> - VER. MM</span></h2>
-
-<div class="container">
 
 <!-- ▼ 班選択 -->
 <div class="select-wrapper">
@@ -184,9 +143,14 @@ select {
   <div id="nextDate" class="sub"></div>
 </div>
 
-</div>
-
 <script>
+
+// ===== 日付フォーマット（曜日付き）=====
+function formatDateWithWeek(dateStr) {
+  const d = new Date(dateStr);
+  const week = ["日","月","火","水","木","金","土"];
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}（${week[d.getDay()]}）`;
+}
 
 // ===== 今日表示 =====
 function formatToday() {
@@ -204,7 +168,7 @@ const schedule = [
       2: "光通信（応用室）",
       3: "シーケンスⅡ（自制Ⅰ）",
       4: "誘導電動機（機器室）",
-      5: "ゲームプログラミング（電算室）"
+      5: "ゲープロ（電算室）"
     }
   },
   { date: "2026-04-21", tasks: {1:"",2:"",3:"",4:"",5:""} },
@@ -216,7 +180,7 @@ const schedule = [
       1: "光通信（応用室）",
       2: "シーケンスⅡ（自制Ⅰ）",
       3: "誘導電動機（機器室）",
-      4: "ゲームプログラミング（電算室）",
+      4: "ゲープロ（電算室）",
       5: "太陽光発電（計測室）"
     }
   }
@@ -295,7 +259,7 @@ function update() {
     document.getElementById("currentTask").innerText = current.theme;
     document.getElementById("currentDates").innerHTML =
       current.dates.map((d, i) =>
-        `${i+1}回目：${d}（あと${calcDays(d)}日）`
+        `${i+1}回目：${formatDateWithWeek(d)}（あと${calcDays(d)}日）`
       ).join("<br>");
   }
 
@@ -303,7 +267,7 @@ function update() {
   if (next) {
     document.getElementById("nextTask").innerText = next.theme;
     document.getElementById("nextDate").innerText =
-      `${next.date}（あと${calcDays(next.date)}日）`;
+      `${formatDateWithWeek(next.date)}（あと${calcDays(next.date)}日）`;
   }
 
   const d = getNextDeadline();
@@ -311,7 +275,7 @@ function update() {
     const days = calcDays(d);
     const el = document.getElementById("deadline");
 
-    el.innerText = `あと${days}日（${d}）`;
+    el.innerText = `あと${days}日（${formatDateWithWeek(d)}）`;
 
     if (days <= 3) {
       el.style.color = "#d00000";
